@@ -1,20 +1,8 @@
 import { useState } from 'react'
 import { MenuItem, Paper, Select, Stack, Typography } from '@mui/material'
 import { categories, transactions } from '../data/demoData'
-import type { Transaction } from '../types'
 import TransactionList from '../components/TransactionList'
-
-const sumAmounts = (items: Transaction[]) =>
-  items.reduce((sum, item) => sum + item.amount, 0)
-
-
-const months = Array.from(new Set(transactions.map(item => item.date.slice(0, 7))))
-  .sort()
-  .reverse()
-
-
-const monthLabel = (month: string) =>
-  new Date(month + '-01').toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })
+import { months, monthLabel, sumAmounts } from '../utils/finance'
 
 function HomePage() {
   const [month, setMonth] = useState(months[0])
