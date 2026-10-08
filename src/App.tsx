@@ -1,11 +1,22 @@
-import { transactions } from "./data/demoData"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Layout from "./components/Layout"
+import HomePage from "./pages/HomePage"
+import CategoriesPage from "./pages/CategoriesPage"
+import ReportsPage from "./pages/ReportsPage"
+
 
 function App() {
   return (
     <>
-        <h1>Get started</h1>
-        <p>{transactions.length}</p>
-        
+        <BrowserRouter>
+          <Routes>
+            <Route element = {<Layout/>}>
+              <Route path="/" element = {< HomePage/>} />
+              <Route path="/categories" element = {<CategoriesPage />} />
+              <Route path="/reports" element =  {<ReportsPage />}  />
+            </Route>
+          </Routes>
+        </BrowserRouter> 
     </>
   )
 }
