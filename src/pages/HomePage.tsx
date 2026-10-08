@@ -1,11 +1,24 @@
 import { useState } from 'react'
 import { MenuItem, Paper, Select, Stack, Typography } from '@mui/material'
-import { categories, transactions } from '../data/demoData'
+import { useData } from '../context/dataContext'
 import TransactionList from '../components/TransactionList'
-import { months, monthLabel, sumAmounts } from '../utils/finance'
+import TransactionDialog from '../components/TransactionDialog'
+import { getMonths, monthLabel, sumAmounts } from '../utils/finance'
+import type { Transaction } from '../types'
+
+
+type DialogState = { type: 'income' | 'expense'; transaction: Transaction | null } | null
 
 function HomePage() {
-  const [month, setMonth] = useState(months[0])
+  const { categories, transactions, addTransaction, updateTransaction, deleteTransaction } =
+    useData()
+
+  const months = getMonths(transactions)
+  const [selectedMonth, setSelectedMonth] = useState(months[0] ?? '')
+
+  const month = months.includes(selectedMonth) ? selectedMonth : (months[0] ?? '')
+
+  const [dialog, setDialog] = useState<DialogState>(null)
 
   const monthExpenses = transactions.filter(
     item => item.type === 'expense' && item.date.startsWith(month)
@@ -24,11 +37,28 @@ function HomePage() {
     { label: 'Баланс', value: balance, color: balance >= 0 ? 'success.main' : 'error.main' },
   ]
 
+  const handleSave = (data: Omit<Transaction, 'id'>) => {
+    if (dialog?.transaction) {
+      updateTransaction({ ...data, id: dialog.transaction.id })
+    } else {
+      addTransaction(data)
+    }
+    setSelectedMonth(data.date.slice(0, 7))
+    setDialog(null)
+  }
+
+  const handleDelete = () => {
+    if (dialog?.transaction) deleteTransaction(dialog.transaction.id)
+    setDialog(null)
+  }
+
+  const defaultDate = `${month || new Date().toISOString().slice(0, 7)}-01`
+
   return (
     <Stack spacing={3} sx={{ py: 3 }}>
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h5">Операции</Typography>
-        <Select size="small" value={month} onChange={event => setMonth(event.target.value)}>
+        <Select size="small" value={month} onChange={event => setSelectedMonth(event.target.value)}>
           {months.map(m => (
             <MenuItem key={m} value={m}>
               {monthLabel(m)}
@@ -55,6 +85,8 @@ function HomePage() {
           categories={categories}
           total={totalExpenses}
           totalColor="error.main"
+          onAdd={() => setDialog({ type: 'expense', transaction: null })}
+          onEdit={transaction => setDialog({ type: 'expense', transaction })}
         />
         <TransactionList
           title="Доходы"
@@ -62,8 +94,22 @@ function HomePage() {
           categories={categories}
           total={totalIncomes}
           totalColor="success.main"
+          onAdd={() => setDialog({ type: 'income', transaction: null })}
+          onEdit={transaction => setDialog({ type: 'income', transaction })}
         />
       </Stack>
+
+      {dialog && (
+        <TransactionDialog
+          type={dialog.type}
+          initial={dialog.transaction}
+          defaultDate={defaultDate}
+          categories={categories}
+          onSave={handleSave}
+          onDelete={handleDelete}
+          onClose={() => setDialog(null)}
+        />
+      )}
     </Stack>
   )
 }

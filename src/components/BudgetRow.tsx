@@ -6,8 +6,9 @@ import type { Category } from '../types'
 interface BudgetRowProps {
   category: Category
   spent: number 
+  onEdit: () => void
+  onDelete: () => void
 }
-
 
 const progressColor = (percent: number) => {
   if (percent > 100) return 'error'
@@ -15,7 +16,7 @@ const progressColor = (percent: number) => {
   return 'success'
 }
 
-function BudgetRow({ category, spent }: BudgetRowProps) {
+function BudgetRow({ category, spent, onEdit, onDelete }: BudgetRowProps) {
   const hasLimit = category.type === 'expense' && category.limit !== undefined
   const limit = category.limit ?? 0
   const percent = hasLimit && limit > 0 ? Math.round((spent / limit) * 100) : 0
@@ -42,10 +43,10 @@ function BudgetRow({ category, spent }: BudgetRowProps) {
           </Typography>
         )}
 
-        <IconButton size="small" aria-label="Изменить">
+        <IconButton size="small" aria-label="Изменить" onClick={onEdit}>
           <EditIcon fontSize="small" />
         </IconButton>
-        <IconButton size="small" aria-label="Удалить">
+        <IconButton size="small" aria-label="Удалить" onClick={onDelete}>
           <DeleteIcon fontSize="small" />
         </IconButton>
       </Stack>
