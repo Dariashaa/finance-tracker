@@ -41,7 +41,7 @@ function TransactionDialog({
   const isValid = Number(amount) > 0 && date !== '' && categoryId !== ''
 
   const handleSave = () => {
-    if (!isValid || categoryId === '') return
+    if (!isValid || !isValid) return
     onSave({
       type,
       amount: Number(amount),

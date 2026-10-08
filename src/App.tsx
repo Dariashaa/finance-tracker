@@ -7,7 +7,6 @@ import { DataProvider } from './context/dataContext'
 
 function App() {
   return (
-    // DataProvider снаружи роутера: данные общие для всех страниц
     <DataProvider>
       <BrowserRouter>
         <Routes>
