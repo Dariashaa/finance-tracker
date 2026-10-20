@@ -7,10 +7,8 @@ interface TransactionRowProps{
     transaction: Transaction
 }
 
-
 function TransactionRow({ transaction, category} : TransactionRowProps){
     const isExpense = transaction.type === "expense"
-
 
     return(
         <Stack direction="row" spacing={2}>

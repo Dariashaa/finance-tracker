@@ -22,18 +22,17 @@ const ALL = 'all'
 const formatMoney = (value: number) => value.toLocaleString('ru-RU') + ' ₽'
 
 function ReportsPage() {
-  // Период: один месяц или все
+
   const { categories, transactions } = useData()
   const months = getMonths(transactions)
   const [selectedPeriod, setSelectedPeriod] = useState<string>(ALL)
-  // Если выбранного месяца больше нет, показываем весь период
   const period =
     selectedPeriod === ALL || months.includes(selectedPeriod) ? selectedPeriod : ALL
 
   const periodTransactions =
     period === ALL ? transactions : transactions.filter(t => t.date.startsWith(period))
 
-  // Данные для круговой диаграммы: расходы по категориям за период
+
   const pieData = categories
     .filter(c => c.type === 'expense')
     .map(c => ({
@@ -43,14 +42,12 @@ function ReportsPage() {
     }))
     .filter(item => item.value > 0)
 
-  // Данные для столбчатой диаграммы: доходы и расходы по месяцам (от старых к новым)
   const barData = [...months].reverse().map(m => ({
     month: monthLabel(m),
     Доходы: sumAmounts(transactions.filter(t => t.type === 'income' && t.date.startsWith(m))),
     Расходы: sumAmounts(transactions.filter(t => t.type === 'expense' && t.date.startsWith(m))),
   }))
 
-  // Экспорт операций выбранного периода в CSV
   const exportCsv = () => {
     const header = ['Дата', 'Тип', 'Категория', 'Сумма', 'Комментарий']
     const rows = [...periodTransactions]
@@ -63,7 +60,6 @@ function ReportsPage() {
         t.comment ?? '',
       ])
 
-    // Значения с кавычками экранируются, разделитель ; открывается в русском Excel
     const csv = [header, ...rows]
       .map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(';'))
       .join('\r\n')
